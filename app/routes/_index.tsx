@@ -5,6 +5,10 @@ export const meta: MetaFunction = () => {
   return [
     {title: 'Spanish Film Festival 2024'},
     {name: 'description', content: 'Welcome to SPA24!'},
+    {
+      property: "og:image",
+      content: "https://shawinnes.com/assets/images/security-through-obscurity-ff324d41f67425d9c5e7ae59a45a76a8.webp",
+    },
   ];
 };
 
