@@ -1,5 +1,5 @@
-import {json, LoaderFunctionArgs, redirect} from '@remix-run/node';
-import {Form, NavLink, useLoaderData} from '@remix-run/react';
+import {ActionFunctionArgs, json, LoaderFunctionArgs, redirect} from '@remix-run/node';
+import {NavLink, useLoaderData, useSubmit} from '@remix-run/react';
 
 import films_data from '../../data/films.json';
 import venue_data from '../../data/brisbane.json';
@@ -8,11 +8,12 @@ import {Film, filmsSchema} from '~/schemas/film';
 import FilmComponent from '~/components/FilmComponent';
 import {Session, venuesSchema} from '~/schemas/venue';
 import SessionsComponent from '~/components/SessionsComponent';
-import {Fragment, useLayoutEffect, useState} from 'react';
+import {Fragment} from 'react';
 import {destroySession, getSession} from '~/services/session.server';
 import {Button} from '~/components/ui/button';
+import {kv} from '@vercel/kv';
 
-export const loader = async ({request} : LoaderFunctionArgs) => {
+export const loader = async ({request}: LoaderFunctionArgs) => {
   const parsedFilms = filmsSchema.safeParse(films_data);
 
   if (!parsedFilms.success) {
@@ -34,53 +35,63 @@ export const loader = async ({request} : LoaderFunctionArgs) => {
     });
   }
 
+  const profileId = session.data.user?.profile?.id;
+
+  const selectedSessions = (await kv.hget<string[]>(profileId, 'selectedSessions')) ?? [];
+  const selectedMovies = (await kv.hget<string[]>(profileId, 'selectedMovies')) ?? [];
+
+  console.log('selectedSessions', selectedSessions);
+  console.log('selectedMovies', selectedMovies);
+
   return json({
-    movies: parsedFilms.data.pageProps.movies,
+    movies: parsedFilms.data.pageProps.movies as Film[],
     categories: parsedFilms.data.pageProps.categories,
-    sessions: parsedVenues.data.pageProps.venue.sessions,
-    profile: session.data.user?.profile,
+    sessions: parsedVenues.data.pageProps.venue.sessions as Session[],
+    profile: session.data.user?.profile as object,
+    selectedSessions: selectedSessions as string[],
+    selectedMovies: selectedMovies as string[],
   });
 };
 
+export const action = async ({request}: ActionFunctionArgs) => {
+  const session = await getSession(request.headers.get('Cookie'));
+  const profileId = session.data.user?.profile?.id;
+  const formData = await request.formData();
+
+  const selectedSessions = formData.get('selectedSessions');
+  if (selectedSessions) {
+    await kv.hset(profileId, {selectedSessions: selectedSessions});
+  }
+
+  const selectedMovies = formData.get('selectedMovies');
+  if (selectedMovies) {
+    await kv.hset(profileId, {selectedMovies: selectedMovies});
+  }
+
+  return {selectedSessions, selectedMovies};
+};
+
 export default function Index() {
-  const {movies, categories, sessions, profile} = useLoaderData<typeof loader>();
-  const [selectedSessions, setSelectedSessions] = useState<string[]>([]);
-  const [selectedMovies, setSelectedMovies] = useState<string[]>([]);
+  const {movies, categories, sessions, profile, selectedSessions, selectedMovies} = useLoaderData<typeof loader>();
+  const submit = useSubmit();
 
-  useLayoutEffect(() => {
-    const loadedSelectedSessions = window.localStorage.getItem('selectedSessions');
-    console.log('loadedSelectedSessions', loadedSelectedSessions);
-    if (loadedSelectedSessions) {
-      setSelectedSessions(JSON.parse(loadedSelectedSessions));
-    }
-
-    const loadedSelectedMovies = window.localStorage.getItem('selectedMovies');
-    if (loadedSelectedMovies) {
-      setSelectedMovies(JSON.parse(loadedSelectedMovies));
-    }
-  }, []);
-
-  const onSetSession = (sessionId: string) => {
+  const onSetSession = async (sessionId: string) => {
     if (selectedSessions.includes(sessionId)) {
       const tempValue = selectedSessions.filter((session) => session !== sessionId);
-      setSelectedSessions(tempValue);
-      window.localStorage.setItem('selectedSessions', JSON.stringify(tempValue));
+      submit({selectedSessions: JSON.stringify(tempValue)}, {method: 'POST'});
     } else {
       const tempValue = [...selectedSessions, sessionId];
-      setSelectedSessions(tempValue);
-      window.localStorage.setItem('selectedSessions', JSON.stringify(tempValue));
+      submit({selectedSessions: JSON.stringify(tempValue)}, {method: 'POST'});
     }
   };
 
-  const onSetMovie = (movieId: string) => {
+  const onSetMovie = async (movieId: string) => {
     if (selectedMovies.includes(movieId)) {
       const tempValue = selectedMovies.filter((movie) => movie !== movieId);
-      setSelectedMovies(tempValue);
-      window.localStorage.setItem('selectedMovies', JSON.stringify(tempValue));
+      submit({selectedMovies: JSON.stringify(tempValue)}, {method: 'POST'});
     } else {
       const tempValue = [...selectedMovies, movieId];
-      setSelectedMovies(tempValue);
-      window.localStorage.setItem('selectedMovies', JSON.stringify(tempValue));
+      submit({selectedMovies: JSON.stringify(tempValue)}, {method: 'POST'});
     }
   };
 
@@ -101,7 +112,6 @@ export default function Index() {
       </div>
       <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 overflow-y-scroll p-4">
-          {JSON.stringify(selectedMovies)}
           {categories.map((category) => (
               <div key={category}>
                 <h1 className="text-lg font-bold">{category}</h1>
