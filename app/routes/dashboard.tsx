@@ -40,9 +40,6 @@ export const loader = async ({request}: LoaderFunctionArgs) => {
   const selectedSessions = (await kv.hget<string[]>(profileId, 'selectedSessions')) ?? [];
   const selectedMovies = (await kv.hget<string[]>(profileId, 'selectedMovies')) ?? [];
 
-  console.log('selectedSessions', selectedSessions);
-  console.log('selectedMovies', selectedMovies);
-
   return json({
     movies: parsedFilms.data.pageProps.movies as Film[],
     categories: parsedFilms.data.pageProps.categories,

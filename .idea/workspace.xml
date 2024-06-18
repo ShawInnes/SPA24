@@ -5,13 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="85fd6e19-d152-4971-bf21-02e975d2c837" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routes/_index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/_index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/components/FilmComponent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/FilmComponent.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routes/dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/dashboard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/vite.config.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,7 +80,7 @@
       <option name="presentableId" value="Default" />
       <updated>1718352742735</updated>
       <workItem from="1718352744214" duration="17994000" />
-      <workItem from="1718698849574" duration="15398000" />
+      <workItem from="1718698849574" duration="16389000" />
     </task>
     <servers />
   </component>

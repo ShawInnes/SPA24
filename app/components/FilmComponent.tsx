@@ -19,7 +19,7 @@ const FilmComponent: React.FC<FilmComponentProps> = ({film, selectedMovies, onCl
         />
         <div className="grow text-red-600 font-semibold text-lg">{film.englishTitle}</div>
         {film.trailerUrl && (<VideoPlayer trailerUrl={film.trailerUrl}/>)}
-        {film.vimeoUrl && (<VideoPlayer trailerUrl={film.vimeoUrl}/>)}
+        {film.vimeoUrl && (<VideoPlayer trailerUrl={`https://vimeo.com/${film.vimeoUrl}`}/>)}
       </div>
     </div>
   );
