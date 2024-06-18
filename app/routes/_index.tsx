@@ -1,48 +1,117 @@
-import type { MetaFunction } from "@remix-run/node";
+import {json, MetaFunction} from '@remix-run/node';
+import {useLoaderData} from '@remix-run/react';
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
+    {title: 'Spanish Film Festival 2024'},
+    {name: 'description', content: 'Welcome to SPA24!'},
   ];
 };
 
+import films_data from '../../data/films.json';
+import venue_data from '../../data/brisbane.json';
+
+import {Film, filmsSchema} from '~/schemas/film';
+import FilmComponent from '~/components/FilmComponent';
+import {Session, venuesSchema} from '~/schemas/venue';
+import SessionsComponent from '~/components/SessionsComponent';
+import {Fragment, useEffect, useLayoutEffect, useState} from 'react';
+
+export const loader = async () => {
+  const parsedFilms = filmsSchema.safeParse(films_data);
+
+  if (!parsedFilms.success) {
+    return json({movies: [], categories: [], sessions: [], error: parsedFilms.error.format()});
+  }
+
+  const parsedVenues = venuesSchema.safeParse(venue_data);
+  if (!parsedVenues.success) {
+    return json({movies: [], categories: [], sessions: [], error: parsedVenues.error.format()});
+  }
+
+  return json({
+    movies: parsedFilms.data.pageProps.movies,
+    categories: parsedFilms.data.pageProps.categories,
+    sessions: parsedVenues.data.pageProps.venue.sessions,
+  });
+};
+
 export default function Index() {
+  const {movies, categories, sessions} = useLoaderData<typeof loader>();
+  const [selectedSessions, setSelectedSessions] = useState<string[]>([]);
+  const [selectedMovies, setSelectedMovies] = useState<string[]>([]);
+
+  useLayoutEffect(() => {
+    const loadedSelectedSessions = window.localStorage.getItem('selectedSessions');
+    console.log('loadedSelectedSessions', loadedSelectedSessions);
+    if (loadedSelectedSessions) {
+      setSelectedSessions(JSON.parse(loadedSelectedSessions));
+    }
+
+    const loadedSelectedMovies = window.localStorage.getItem('selectedMovies');
+    if (loadedSelectedMovies) {
+      setSelectedMovies(JSON.parse(loadedSelectedMovies));
+    }
+  }, []);
+
+  const onSetSession = (sessionId: string) => {
+    if (selectedSessions.includes(sessionId)) {
+      const tempValue = selectedSessions.filter((session) => session !== sessionId);
+      setSelectedSessions(tempValue);
+      window.localStorage.setItem('selectedSessions', JSON.stringify(tempValue));
+    } else {
+      const tempValue = [...selectedSessions, sessionId];
+      setSelectedSessions(tempValue);
+      window.localStorage.setItem('selectedSessions', JSON.stringify(tempValue));
+    }
+  };
+
+  const onSetMovie = (movieId: string) => {
+    if (selectedMovies.includes(movieId)) {
+      const tempValue = selectedMovies.filter((movie) => movie !== movieId);
+      setSelectedMovies(tempValue);
+      window.localStorage.setItem('selectedMovies', JSON.stringify(tempValue));
+    } else {
+      const tempValue = [...selectedMovies, movieId];
+      setSelectedMovies(tempValue);
+      window.localStorage.setItem('selectedMovies', JSON.stringify(tempValue));
+    }
+  };
+
   return (
-    <div className="font-sans p-4">
-      <h1 className="text-3xl">Welcome to Remix</h1>
-      <ul className="list-disc mt-4 pl-6 space-y-2">
-        <li>
-          <a
-            className="text-blue-700 underline visited:text-purple-900"
-            target="_blank"
-            href="https://remix.run/start/quickstart"
-            rel="noreferrer"
-          >
-            5m Quick Start
-          </a>
-        </li>
-        <li>
-          <a
-            className="text-blue-700 underline visited:text-purple-900"
-            target="_blank"
-            href="https://remix.run/start/tutorial"
-            rel="noreferrer"
-          >
-            30m Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            className="text-blue-700 underline visited:text-purple-900"
-            target="_blank"
-            href="https://remix.run/docs"
-            rel="noreferrer"
-          >
-            Remix Docs
-          </a>
-        </li>
-      </ul>
+    <div className="flex h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+      <div className="gap-2 border-1 border-black">
+        <div className="flex items-center border-b px-4 lg:h-[60px] lg:px-6">
+          <h1 className="text-xl">Welcome to SPA24</h1>
+        </div>
+      </div>
+      <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 overflow-y-scroll p-4">
+          {JSON.stringify(selectedMovies)}
+          {categories.map((category) => (
+              <div key={category}>
+                <h1 className="text-lg font-bold">{category}</h1>
+                {movies
+                  .filter((movie: Film) => movie.categoryName === category)
+                  .map((movie: Film) => (
+                    <Fragment key={`${movie.categoryName}-${movie.slug}`}>
+                      <FilmComponent
+                        selectedMovies={selectedMovies}
+                        onClickHandler={onSetMovie}
+                        film={movie}/>
+                      <SessionsComponent
+                        debug={false}
+                        onClickHandler={onSetSession}
+                        selectedSessions={selectedSessions}
+                        sessions={sessions.filter((session: Session) => session.movieId === movie.movieId)}/>
+                    </Fragment>
+                  ))}
+              </div>
+            ),
+          )}
+        </div>
+      </div>
     </div>
-  );
+  )
+    ;
 }
