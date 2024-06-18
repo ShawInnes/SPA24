@@ -49,12 +49,19 @@ function handleBotRequest(
 ) {
   return new Promise((resolve, reject) => {
     let shellRendered = false;
+    const acceptLanguage = request.headers.get('accept-language');
+    const locales = parseAcceptLanguage(acceptLanguage, {
+      validate: Intl.DateTimeFormat.supportedLocalesOf,
+    });
+
     const {pipe, abort} = renderToPipeableStream(
-      <RemixServer
-        context={remixContext}
-        url={request.url}
-        abortDelay={ABORT_DELAY}
-      />,
+      <LocaleContextProvider locales={locales}>
+        <RemixServer
+          context={remixContext}
+          url={request.url}
+          abortDelay={ABORT_DELAY}
+        />
+      </LocaleContextProvider>,
       {
         onAllReady() {
           shellRendered = true;

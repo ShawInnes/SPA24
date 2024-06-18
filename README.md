@@ -1,6 +1,6 @@
-# Welcome to Remix!
+# Welcome to Spanish Film Festival 2024!
 
-- 📖 [Remix docs](https://remix.run/docs)
+Demo: https://spa-24.vercel.app/
 
 ## Development
 
@@ -39,9 +39,10 @@ Make sure to deploy the output of `npm run build`
 
 This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever css framework you prefer. See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.
 
-https://spanishfilmfestival.com/_next/data/556m7wsHQVrGTcwI-f28F/venues/Brisbane.json
+## Data
 
-https://spanishfilmfestival.com/_next/data/556m7wsHQVrGTcwI-f28F/films.json
+This is using data from the spanish film festival website:
 
-
-https://spanishfilmfestival.com/films/the-teacher-who-promised-the-sea
+* https://spanishfilmfestival.com/_next/data/556m7wsHQVrGTcwI-f28F/venues/Brisbane.json
+* https://spanishfilmfestival.com/_next/data/556m7wsHQVrGTcwI-f28F/films.json
+* https://spanishfilmfestival.com/films/the-teacher-who-promised-the-sea

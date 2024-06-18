@@ -1,5 +1,5 @@
-import {json, MetaFunction} from '@remix-run/node';
-import {useLoaderData} from '@remix-run/react';
+import {ActionFunctionArgs, json, MetaFunction} from '@remix-run/node';
+import {Form, useLoaderData} from '@remix-run/react';
 
 export const meta: MetaFunction = () => {
   return [
@@ -16,6 +16,7 @@ import FilmComponent from '~/components/FilmComponent';
 import {Session, venuesSchema} from '~/schemas/venue';
 import SessionsComponent from '~/components/SessionsComponent';
 import {Fragment, useEffect, useLayoutEffect, useState} from 'react';
+import {authenticator} from '~/services/auth.server';
 
 export const loader = async () => {
   const parsedFilms = filmsSchema.safeParse(films_data);
@@ -34,6 +35,21 @@ export const loader = async () => {
     categories: parsedFilms.data.pageProps.categories,
     sessions: parsedVenues.data.pageProps.venue.sessions,
   });
+};
+
+export const action = async ({request}: ActionFunctionArgs) => {
+  try {
+    await authenticator.authenticate('oauth2-strategy', request, {
+      successRedirect: '/',
+    });
+    return {error: null};
+  } catch (error) {
+    // This allows us to return errors to the page without triggering the error boundary.
+    if (error instanceof Response && error.status >= 400) {
+      return {error: (await error.json()) as {message: string}};
+    }
+    throw error;
+  }
 };
 
 export default function Index() {
@@ -83,6 +99,11 @@ export default function Index() {
       <div className="gap-2 border-1 border-black">
         <div className="flex items-center border-b px-4 lg:h-[60px] lg:px-6">
           <h1 className="text-xl">Welcome to SPA24</h1>
+        </div>
+        <div>
+          <Form method="post">
+            <button type="submit">Log In</button>
+          </Form>
         </div>
       </div>
       <div className="flex-1 flex overflow-hidden">
