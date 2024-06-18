@@ -23,7 +23,7 @@ authenticator.use(
 
       authorizationEndpoint: `https://facebook.com/v20.0/dialog/oauth`,
       tokenEndpoint: `https://graph.facebook.com/v20.0/oauth/access_token`,
-      redirectURI: 'http://localhost:5173/auth/callback' //'https://spa-24.vercel.app/auth/callback',
+      redirectURI: process.env.REDIRECT_URI ?? ''
     },
     ({tokens, profile}) => {
       // here you can use the params above to get the user and return it

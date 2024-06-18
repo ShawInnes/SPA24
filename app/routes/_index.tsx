@@ -6,8 +6,8 @@ export const meta: MetaFunction = () => {
     {title: 'Spanish Film Festival 2024'},
     {name: 'description', content: 'Welcome to SPA24!'},
     {
-      property: "og:image",
-      content: "https://shawinnes.com/assets/images/security-through-obscurity-ff324d41f67425d9c5e7ae59a45a76a8.webp",
+      property: 'og:image',
+      content: 'https://shawinnes.com/assets/images/security-through-obscurity-ff324d41f67425d9c5e7ae59a45a76a8.webp',
     },
   ];
 };
@@ -19,7 +19,7 @@ import {Film, filmsSchema} from '~/schemas/film';
 import FilmComponent from '~/components/FilmComponent';
 import {Session, venuesSchema} from '~/schemas/venue';
 import SessionsComponent from '~/components/SessionsComponent';
-import {Fragment, useEffect, useLayoutEffect, useState} from 'react';
+import {Fragment, useLayoutEffect, useState} from 'react';
 import {authenticator} from '~/services/auth.server';
 
 export const loader = async () => {
