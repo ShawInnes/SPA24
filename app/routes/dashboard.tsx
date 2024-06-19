@@ -12,6 +12,7 @@ import {Fragment} from 'react';
 import {destroySession, getSession} from '~/services/session.server';
 import {Button} from '~/components/ui/button';
 import {kv} from '@vercel/kv';
+import CategoryComponent from '~/components/CategoryComponent';
 
 export const loader = async ({request}: LoaderFunctionArgs) => {
   const parsedFilms = filmsSchema.safeParse(films_data);
@@ -42,7 +43,7 @@ export const loader = async ({request}: LoaderFunctionArgs) => {
 
   return json({
     movies: parsedFilms.data.pageProps.movies as Film[],
-    categories: parsedFilms.data.pageProps.categories,
+    categories: parsedFilms.data.pageProps.categories as string[],
     sessions: parsedVenues.data.pageProps.venue.sessions as Session[],
     profile: session.data.user?.profile as object,
     selectedSessions: selectedSessions as string[],
@@ -94,45 +95,48 @@ export default function Index() {
 
   return (
     <div className="flex h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      <div className="gap-2 border-1 border-black">
-        <div className="flex items-center border-b px-4 lg:h-[60px] lg:px-6">
+      <div className="gap-2 border-r border-gray-300 bg-white shadow-lg flex flex-col h-full">
+        <div className="flex items-center border-b px-4 lg:h-[60px] lg:px-6 bg-yellow-300">
           <h1 className="text-xl">Welcome to SPA24</h1>
         </div>
-        <div className="p-4">
-          <p>
-            {profile?.displayName}
-          </p>
-          <Button>
-            <NavLink to="/logout">Logout</NavLink>
-          </Button>
+        <div className="flex flex-grow flex-col p-4 items-center">
+          <div>{profile?.displayName}</div>
+          <div>
+            a little calendar here
+          </div>
+          <div className="mt-auto">
+            <Button>
+              <NavLink to="/logout">Logout</NavLink>
+            </Button>
+          </div>
         </div>
       </div>
-      <div className="flex-1 flex overflow-hidden">
-        <div className="flex-1 overflow-y-scroll p-4">
+      <div className="flex-1 flex overflow-hidden" style={{backgroundImage: 'url(\'/images/login-background.webp\')'}}>
+        <div className="flex-1 overflow-y-scroll">
           {categories.map((category) => (
-              <div key={category}>
-                <h1 className="text-lg font-bold">{category}</h1>
-                {movies
-                  .filter((movie: Film) => movie.categoryName === category)
-                  .map((movie: Film) => (
-                    <Fragment key={`${movie.categoryName}-${movie.slug}`}>
-                      <FilmComponent
-                        selectedMovies={selectedMovies}
-                        onClickHandler={onSetMovie}
-                        film={movie}/>
-                      <SessionsComponent
-                        debug={false}
-                        onClickHandler={onSetSession}
-                        selectedSessions={selectedSessions}
-                        sessions={sessions.filter((session: Session) => session.movieId === movie.movieId)}/>
-                    </Fragment>
-                  ))}
-              </div>
-            ),
-          )}
+            <div key={category}>
+              <CategoryComponent category={category}></CategoryComponent>
+              {movies
+                .filter((movie: Film) => movie.categoryName === category)
+                .map((movie: Film) => (
+                  <Fragment key={`${movie.categoryName}-${movie.slug}`}>
+                    <FilmComponent
+                      selectedMovies={selectedMovies}
+                      onClickHandler={onSetMovie}
+                      film={movie}
+                    />
+                    <SessionsComponent
+                      debug={false}
+                      onClickHandler={onSetSession}
+                      selectedSessions={selectedSessions}
+                      sessions={sessions.filter((session: Session) => session.movieId === movie.movieId)}
+                    />
+                  </Fragment>
+                ))}
+            </div>
+          ))}
         </div>
       </div>
     </div>
-  )
-    ;
+  );
 }

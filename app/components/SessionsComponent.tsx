@@ -10,7 +10,6 @@ type SessionsComponentProps = {
   debug?: boolean;
   onClickHandler: (sessionId: string) => void;
 };
-
 const SessionsComponent: React.FC<SessionsComponentProps> = ({
                                                                sessions,
                                                                selectedSessions,
@@ -19,7 +18,7 @@ const SessionsComponent: React.FC<SessionsComponentProps> = ({
                                                                onClickHandler,
                                                              }) => {
   return (
-    <div className="flex flex-row py-2">
+    <div className="flex flex-row py-2 px-2">
       {sessions
         .filter((session) => session.cinemaId === cinemaId)
         .map((session) => (
@@ -31,17 +30,16 @@ const SessionsComponent: React.FC<SessionsComponentProps> = ({
             className="flex flex-col items-center
                transition-colors duration-500 ease-in-out
                border-2 mx-2 min-w-[65px]
+               bg-white
                border-l-black
-               data-[selected=true]:border-green-500
-               data-[selected=true]:bg-green-200
-               hover:bg-red-600
+               data-[selected=true]:border-[#ff9800]
+               data-[selected=true]:bg-[#ffecb3]
+               hover:bg-[#d32f2f]
                hover:data-[selected=false]:text-white
-               data-[specialevent=true]:bg-amber-200
-               hover:data-[specialevent=true]:bg-red-600
+               data-[specialevent=true]:bg-[#fff59d]
+               hover:data-[specialevent=true]:bg-[#d32f2f]
                hover:scale-110
-               rounded-md
-               ">
-            {debug && (<div className="">{session.sessionId}</div>)}
+               rounded-md">
 
             <IntlDate date={new Date(session.showtimeDate)} timeZone="UTC"/>
 
