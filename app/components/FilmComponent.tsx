@@ -1,7 +1,8 @@
 import * as React from 'react';
 import {Film} from '~/schemas/film';
 import VideoPlayer from '~/components/VideoPlayer';
-import {Checkbox} from '~/components/ui/checkbox';
+import FilmHeaderComponent from '~/components/FilmHeaderComponent';
+import {LinkIcon} from '@heroicons/react/24/solid';
 
 type FilmComponentProps = {
   film: Film;
@@ -10,14 +11,23 @@ type FilmComponentProps = {
 };
 
 const FilmComponent: React.FC<FilmComponentProps> = ({film, selectedMovies, onClickHandler}) => {
+  const isSelected = selectedMovies.includes(film.movieId);
+
   return (
-    <div className="flex flex-col bg-[#ffefd5] p-4 rounded-lg shadow-md my-2 mx-2">
+    <div data-isSelected={isSelected} className="flex flex-col bg-amber-50
+    data-[isSelected=true]:bg-amber-300
+    data-[isSelected=true]:border-red-500
+    data-[isSelected=true]:border-4
+    p-3 rounded-lg shadow-md my-2 mx-2">
       <div className="flex flex-row items-center">
-        <Checkbox className="mx-2"
-                  onClick={() => onClickHandler(film.movieId)}
-                  checked={selectedMovies.includes(film.movieId)}
-        />
-        <div className="grow text-[#c62828] font-semibold text-lg">{film.englishTitle}</div>
+        <div className="grow flex-row">
+          <FilmHeaderComponent film={film} selectedMovies={selectedMovies} onClickHandler={onClickHandler}/>
+        </div>
+        <div className="pe-2">
+          <a href={`https://spanishfilmfestival.com/films/${film.slug}`} target="_blank" rel="noreferrer">
+            <LinkIcon className="h-6 w-6"/>
+          </a>
+        </div>
         {film.trailerUrl && (<VideoPlayer trailerUrl={film.trailerUrl}/>)}
         {film.vimeoUrl && (<VideoPlayer trailerUrl={`https://vimeo.com/${film.vimeoUrl}`}/>)}
       </div>
@@ -25,3 +35,4 @@ const FilmComponent: React.FC<FilmComponentProps> = ({film, selectedMovies, onCl
   );
 };
 export default FilmComponent;
+

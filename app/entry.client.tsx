@@ -8,6 +8,7 @@ import {RemixBrowser} from '@remix-run/react';
 import {startTransition, StrictMode} from 'react';
 import {hydrateRoot} from 'react-dom/client';
 import {LocaleContextProvider} from '~/providers/LocaleProvider';
+import {TooltipProvider} from '~/components/ui/tooltip';
 
 const locales = window.navigator.languages as string[];
 
@@ -15,9 +16,11 @@ startTransition(() => {
   hydrateRoot(
     document,
     <StrictMode>
-      <LocaleContextProvider locales={locales}>
-        <RemixBrowser/>
-      </LocaleContextProvider>
+      <TooltipProvider delayDuration={150}>
+        <LocaleContextProvider locales={locales}>
+          <RemixBrowser/>
+        </LocaleContextProvider>
+      </TooltipProvider>
     </StrictMode>,
   );
 });

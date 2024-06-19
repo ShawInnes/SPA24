@@ -13,8 +13,12 @@ import {destroySession, getSession} from '~/services/session.server';
 import {Button} from '~/components/ui/button';
 import {kv} from '@vercel/kv';
 import CategoryComponent from '~/components/CategoryComponent';
+import {Calendar} from '~/components/ui/calendar';
+import {LinkIcon} from '@heroicons/react/24/solid';
+import * as React from 'react';
+import dayjs from 'dayjs';
 
-export const loader = async ({request}: LoaderFunctionArgs) => {
+export const loader: any = async ({request}: LoaderFunctionArgs) => {
   const parsedFilms = filmsSchema.safeParse(films_data);
 
   if (!parsedFilms.success) {
@@ -69,6 +73,15 @@ export const action = async ({request}: ActionFunctionArgs) => {
   return {selectedSessions, selectedMovies};
 };
 
+export const getSelectedSessions = (sessions: Session[], selectedSessions: string[]) => {
+  const filteredSessions = sessions.filter((session) => selectedSessions.includes(session.sessionId));
+  return filteredSessions.map(p => dayjs(p.showtimeDate.replace('Z','')).toDate());
+};
+
+export const getSelectedMovie = (movies: Film[], movieId: string): Film => {
+  return movies.find((movie) => movie.movieId === movieId) as Film;
+};
+
 export default function Index() {
   const {movies, categories, sessions, profile, selectedSessions, selectedMovies} = useLoaderData<typeof loader>();
   const submit = useSubmit();
@@ -95,14 +108,21 @@ export default function Index() {
 
   return (
     <div className="flex h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      <div className="gap-2 border-r border-gray-300 bg-white shadow-lg flex flex-col h-full">
+      <div
+        className="gap-2 border-r border-gray-300 bg-white shadow-lg flex flex-col h-full md:max-w-[220px] lg:max-w-[280px]">
         <div className="flex items-center border-b px-4 lg:h-[60px] lg:px-6 bg-yellow-300">
-          <h1 className="text-xl">Welcome to SPA24</h1>
+          <h1>Welcome to SPA24</h1>
         </div>
         <div className="flex flex-grow flex-col p-4 items-center">
           <div>{profile?.displayName}</div>
-          <div>
-            a little calendar here
+          <div className="pt-4">
+            <Calendar mode="multiple"
+                      className="rounded-md border p-4"
+                      selected={getSelectedSessions(sessions, selectedSessions)}
+            />
+          </div>
+          <div className="pt-4">
+            {selectedMovies.length} selected movies
           </div>
           <div className="mt-auto">
             <Button>
@@ -111,7 +131,8 @@ export default function Index() {
           </div>
         </div>
       </div>
-      <div className="flex-1 flex overflow-hidden" style={{backgroundImage: 'url(\'/images/login-background.webp\')'}}>
+      <div className="flex-1 flex overflow-hidden"
+           style={{backgroundImage: 'url(\'/images/muted-background.jpg\')'}}>
         <div className="flex-1 overflow-y-scroll">
           {categories.map((category) => (
             <div key={category}>

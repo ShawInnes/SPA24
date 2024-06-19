@@ -22,7 +22,7 @@ export default function Index() {
     <div className="flex h-screen w-full justify-center items-center bg-cover bg-center"
          style={{backgroundImage: "url('/images/login-background.webp')"}}>
       <div className="flex flex-col items-center bg-white bg-opacity-70 p-8 rounded-lg">
-        <h1 className="pb-4 text-xl">Spanish Film Festival 2024</h1>
+        <h1 className="pb-4">Spanish Film Festival 2024</h1>
 
         <Form action="/auth/google" method="post">
           <Button>Login with Google</Button>

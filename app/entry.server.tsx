@@ -13,6 +13,7 @@ import {isbot} from 'isbot';
 import {renderToPipeableStream} from 'react-dom/server';
 import {parseAcceptLanguage} from 'intl-parse-accept-language';
 import {LocaleContextProvider} from '~/providers/LocaleProvider';
+import {TooltipProvider} from '~/components/ui/tooltip';
 
 const ABORT_DELAY = 5_000;
 
@@ -56,11 +57,14 @@ function handleBotRequest(
 
     const {pipe, abort} = renderToPipeableStream(
       <LocaleContextProvider locales={locales}>
-        <RemixServer
-          context={remixContext}
-          url={request.url}
-          abortDelay={ABORT_DELAY}
-        />
+        <TooltipProvider delayDuration={150}>
+
+          <RemixServer
+            context={remixContext}
+            url={request.url}
+            abortDelay={ABORT_DELAY}
+          />
+        </TooltipProvider>
       </LocaleContextProvider>,
       {
         onAllReady() {
@@ -113,11 +117,13 @@ function handleBrowserRequest(
     let shellRendered = false;
     const {pipe, abort} = renderToPipeableStream(
       <LocaleContextProvider locales={locales}>
-        <RemixServer
-          context={remixContext}
-          url={request.url}
-          abortDelay={ABORT_DELAY}
-        />
+        <TooltipProvider delayDuration={150}>
+          <RemixServer
+            context={remixContext}
+            url={request.url}
+            abortDelay={ABORT_DELAY}
+          />
+        </TooltipProvider>
       </LocaleContextProvider>,
       {
         onShellReady() {

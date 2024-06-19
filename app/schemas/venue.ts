@@ -6,7 +6,7 @@ export const sessionSchema = z.object({
   title: z.string(),
   // englishTitle: z.string(),
   // originalTitle: z.string(),
-  // rating: z.string(),
+  rating: z.string(),
   genreNames: z.array(z.string()),
   runTime: z.string(),
   // heroImage: z.string(),
@@ -18,7 +18,7 @@ export const sessionSchema = z.object({
   // displayAttributeText: z.string(),
   // displayAttributeColour: z.string(),
   cinemaId: z.string(),
-  // localityName: z.string(),
+  localityName: z.string(),
   cinemaName: z.string(),
   // sessionUrl: z.string(),
 });

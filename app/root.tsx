@@ -7,6 +7,11 @@ import {
 } from '@remix-run/react';
 import './globals.css';
 
+export function links() {
+  return [
+    { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Yeseva+One&display=swap" },
+  ];
+}
 export function Layout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en">
