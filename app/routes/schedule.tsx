@@ -53,27 +53,9 @@ export const loader: any = async ({request}: LoaderFunctionArgs) => {
   });
 };
 
-export const action = async ({request}: ActionFunctionArgs) => {
-  const session = await getSession(request.headers.get('Cookie'));
-  const profileId = session.data.user?.profile?.id;
-  const formData = await request.formData();
-
-  const selectedSessions = formData.get('selectedSessions');
-  if (selectedSessions) {
-    await kv.hset(profileId, {selectedSessions: selectedSessions});
-  }
-
-  const selectedMovies = formData.get('selectedMovies');
-  if (selectedMovies) {
-    await kv.hset(profileId, {selectedMovies: selectedMovies});
-  }
-
-  return {selectedSessions, selectedMovies};
-};
-
 export const getSelectedSessions = (sessions: Session[], selectedSessions: string[]) => {
   const filteredSessions = sessions.filter((session) => selectedSessions.includes(session.sessionId));
-  return filteredSessions.map(p => dayjs(p.showtimeDate.replace('Z','')).toDate());
+  return filteredSessions.map(p => dayjs(p.showtimeDate.replace('Z', '')).toDate());
 };
 
 export const getSelectedMovie = (movies: Film[], movieId: string): Film => {
@@ -81,28 +63,7 @@ export const getSelectedMovie = (movies: Film[], movieId: string): Film => {
 };
 
 export default function Index() {
-  const {movies, categories, sessions, profile, selectedSessions, selectedMovies} = useLoaderData<typeof loader>();
-  const submit = useSubmit();
-
-  const onSetSession = async (sessionId: string) => {
-    if (selectedSessions.includes(sessionId)) {
-      const tempValue = selectedSessions.filter((session) => session !== sessionId);
-      submit({selectedSessions: JSON.stringify(tempValue)}, {method: 'POST'});
-    } else {
-      const tempValue = [...selectedSessions, sessionId];
-      submit({selectedSessions: JSON.stringify(tempValue)}, {method: 'POST'});
-    }
-  };
-
-  const onSetMovie = async (movieId: string) => {
-    if (selectedMovies.includes(movieId)) {
-      const tempValue = selectedMovies.filter((movie) => movie !== movieId);
-      submit({selectedMovies: JSON.stringify(tempValue)}, {method: 'POST'});
-    } else {
-      const tempValue = [...selectedMovies, movieId];
-      submit({selectedMovies: JSON.stringify(tempValue)}, {method: 'POST'});
-    }
-  };
+  const {movies, sessions, profile, selectedSessions, selectedMovies} = useLoaderData<typeof loader>();
 
   return (
     <div className="flex h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
@@ -114,49 +75,28 @@ export default function Index() {
         <div className="flex flex-grow flex-col p-4 items-center">
           <div>{profile?.displayName}</div>
           <div className="pt-4">
-            <Calendar mode="multiple"
-                      className="rounded-md border p-4"
-                      selected={getSelectedSessions(sessions, selectedSessions)}
-            />
-          </div>
-          <div className="pt-4">
             {selectedMovies.length} selected movies
           </div>
-          <div className="mt-auto flex-col">
-            <Button className="m-2">
-              <NavLink to="/schedule">Schedule</NavLink>
-            </Button>
-            <Button className="m-2">
+          <div className="mt-auto">
+            <Button>
               <NavLink to="/logout">Logout</NavLink>
             </Button>
           </div>
         </div>
       </div>
-      <div className="flex-1 flex overflow-hidden"
-           style={{backgroundImage: 'url(\'/images/muted-background.jpg\')'}}>
+      <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 overflow-y-scroll">
-          {categories.map((category) => (
-            <div key={category}>
-              <CategoryComponent category={category}></CategoryComponent>
-              {movies
-                .filter((movie: Film) => movie.categoryName === category)
-                .map((movie: Film) => (
-                  <Fragment key={`${movie.categoryName}-${movie.slug}`}>
-                    <FilmComponent
-                      selectedMovies={selectedMovies}
-                      onClickHandler={onSetMovie}
-                      film={movie}
-                    />
-                    <SessionsComponent
-                      debug={false}
-                      onClickHandler={onSetSession}
-                      selectedSessions={selectedSessions}
-                      sessions={sessions.filter((session: Session) => session.movieId === movie.movieId)}
-                    />
-                  </Fragment>
-                ))}
-            </div>
-          ))}
+          {selectedMovies.map((movieId) => {
+            const movie = getSelectedMovie(movies, movieId);
+            return (
+              <div key={movieId}>
+                <h1>{movie.englishTitle}</h1>
+                <SessionsComponent
+                  sessions={sessions.filter((session: Session) => session.movieId === movie.movieId)}
+                  selectedSessions={selectedSessions}
+                  />
+              </div>);
+          })}
         </div>
       </div>
     </div>

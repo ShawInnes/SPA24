@@ -3,19 +3,19 @@ import {Session} from '~/schemas/venue';
 import {IntlDate} from '~/components/IntlDate';
 import {IntlTime} from '~/components/IntlTime';
 import {Tooltip, TooltipContent, TooltipTrigger} from '~/components/ui/tooltip';
+import {IntlDay} from '~/components/IntlDay';
 
 type SessionsComponentProps = {
   sessions: Session[];
   selectedSessions: string[];
   cinemaId?: string;
   debug?: boolean;
-  onClickHandler: (sessionId: string) => void;
+  onClickHandler?: (sessionId: string) => void;
 };
 const SessionsComponent: React.FC<SessionsComponentProps> = ({
                                                                sessions,
                                                                selectedSessions,
                                                                cinemaId = '121',
-                                                               debug = true,
                                                                onClickHandler,
                                                              }) => {
   return (
@@ -28,7 +28,7 @@ const SessionsComponent: React.FC<SessionsComponentProps> = ({
             <Tooltip key={session.sessionId}>
               <TooltipTrigger asChild>
                 <button
-                  onClick={() => onClickHandler(session.sessionId)}
+                  onClick={() => onClickHandler ? onClickHandler(session.sessionId) : null}
                   data-specialevent={session.isSpecialEvent}
                   data-selected={selectedSessions.includes(session.sessionId)}
                   data-ispastdate={isPastDate}
@@ -47,6 +47,7 @@ const SessionsComponent: React.FC<SessionsComponentProps> = ({
                   flex flex-col items-center transition-colors duration-500 ease-in-out border-2 mx-2 min-w-[65px] bg-white rounded-md`}
                   disabled={isPastDate}
                 >
+                  <IntlDay date={new Date(session.showtimeDate)} timeZone="UTC"/>
                   <IntlDate date={new Date(session.showtimeDate)} timeZone="UTC"/>
                   <IntlTime date={new Date(session.showtimeDate)} timeZone="UTC"/>
                   {isPastDate && (
