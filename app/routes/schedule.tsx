@@ -95,43 +95,56 @@ export default function Index() {
   };
 
   return (
-    <div className="flex h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+    <>
       <div
-        className="hidden md:block lg:block gap-2 border-r border-gray-300 bg-white shadow-lg flex flex-col h-full md:max-w-[220px] lg:max-w-[280px]">
-        <div className="flex items-center border-b px-4 lg:h-[60px] lg:px-6 bg-yellow-300">
-          <h1>Welcome to SPA24</h1>
-        </div>
-        <div className="flex flex-grow flex-col p-4 items-center">
-          <div>{profile?.displayName}</div>
-          <div className="pt-4">
-            {selectedMovies.length} selected movies
-          </div>
-          <div className="mt-auto">
-            <Button className="m-2">
-              <NavLink to="/dashboard">Full List</NavLink>
-            </Button>
-            <Button>
-              <NavLink to="/logout">Logout</NavLink>
-            </Button>
-          </div>
+        className="lg:hidden md:hidden border-gray-300 bg-white shadow-lg">
+        <div className="mt-auto flex-col">
+          <Button className="m-2">
+            <NavLink to="/schedule">My Schedule</NavLink>
+          </Button>
+          <Button className="m-2">
+            <NavLink to="/logout">Logout</NavLink>
+          </Button>
         </div>
       </div>
-      <div className="flex-1 flex overflow-hidden">
-        <div className="flex-1 overflow-y-scroll pl-2">
-          {selectedMovies.map((movieId) => {
-            const movie = getSelectedMovie(movies, movieId);
-            return (
-              <div key={movieId}>
-                <h1>{movie.englishTitle}</h1>
-                <SessionsComponent
-                  sessions={sessions.filter((session: Session) => session.movieId === movie.movieId)}
-                  selectedSessions={selectedSessions}
-                  onClickHandler={onSetSession}
+      <div className="flex h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+        <div
+          className="hidden md:block lg:block gap-2 border-r border-gray-300 bg-white shadow-lg flex flex-col h-full md:max-w-[220px] lg:max-w-[280px]">
+          <div className="flex items-center border-b px-4 lg:h-[60px] lg:px-6 bg-yellow-300">
+            <h1>Welcome to SPA24</h1>
+          </div>
+          <div className="flex flex-grow flex-col p-4 items-center">
+            <div>{profile?.displayName}</div>
+            <div className="pt-4">
+              {selectedMovies.length} selected movies
+            </div>
+            <div className="mt-auto">
+              <Button className="m-2">
+                <NavLink to="/dashboard">Full List</NavLink>
+              </Button>
+              <Button>
+                <NavLink to="/logout">Logout</NavLink>
+              </Button>
+            </div>
+          </div>
+        </div>
+        <div className="flex-1 flex overflow-hidden">
+          <div className="flex-1 overflow-y-scroll pl-2">
+            {selectedMovies.map((movieId) => {
+              const movie = getSelectedMovie(movies, movieId);
+              return (
+                <div key={movieId}>
+                  <h1>{movie.englishTitle}</h1>
+                  <SessionsComponent
+                    sessions={sessions.filter((session: Session) => session.movieId === movie.movieId)}
+                    selectedSessions={selectedSessions}
+                    onClickHandler={onSetSession}
                   />
-              </div>);
-          })}
+                </div>);
+            })}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

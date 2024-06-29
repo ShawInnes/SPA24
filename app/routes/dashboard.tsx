@@ -105,60 +105,74 @@ export default function Index() {
   };
 
   return (
-    <div className="flex h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      {/* Sidebar */}
+    <>
       <div
-        className="hidden md:block lg:block gap-2 border-r border-gray-300 bg-white shadow-lg flex flex-col h-full md:max-w-[220px] lg:max-w-[280px]">
-        <div className="flex items-center border-b px-4 lg:h-[60px] lg:px-6 bg-yellow-300">
-          <h1>Welcome to SPA24</h1>
-        </div>
-        {/* Menu items */}
-        <div className="flex flex-grow flex-col p-4 items-center">
-          <div>{profile?.displayName}</div>
-          <div className="pt-4">
-            <Calendar
-              mode="multiple"
-              className="rounded-md border p-4"
-              selected={getSelectedSessions(sessions, selectedSessions)}
-            />
-          </div>
-          <div className="pt-4">{selectedMovies.length} selected movies</div>
-          {/* Sidebar buttons */}
-          <div className="mt-auto flex-col">
-            <Button className="m-2">
-              <NavLink to="/schedule">My Schedule</NavLink>
-            </Button>
-            <Button className="m-2">
-              <NavLink to="/logout">Logout</NavLink>
-            </Button>
-          </div>
+        className="lg:hidden md:hidden border-gray-300 bg-white shadow-lg">
+        <div className="mt-auto flex-col">
+          <Button className="m-2">
+            <NavLink to="/schedule">My Schedule</NavLink>
+          </Button>
+          <Button className="m-2">
+            <NavLink to="/logout">Logout</NavLink>
+          </Button>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden" style={{backgroundImage: 'url(\'/images/muted-background.jpg\')'}}>
-        <div className="flex-1 overflow-y-scroll">
-          {/* Main content */}
-          {categories.map((category) => (
-            <div key={category}>
-              <CategoryComponent category={category}></CategoryComponent>
-              {movies
-                .filter((movie) => movie.categoryName === category)
-                .map((movie) => (
-                  <Fragment key={`${movie.categoryName}-${movie.slug}`}>
-                    <FilmComponent selectedMovies={selectedMovies} onClickHandler={onSetMovie} film={movie}/>
-                    <SessionsComponent
-                      debug={false}
-                      onClickHandler={onSetSession}
-                      selectedSessions={selectedSessions}
-                      sessions={sessions.filter((session) => session.movieId === movie.movieId)}
-                    />
-                  </Fragment>
-                ))}
+      <div className="flex h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+        {/* Sidebar */}
+        <div
+          className="hidden md:block lg:block gap-2 border-r border-gray-300 bg-white shadow-lg flex flex-col h-full md:max-w-[220px] lg:max-w-[280px]">
+          <div className="flex items-center border-b px-4 lg:h-[60px] lg:px-6 bg-yellow-300">
+            <h1>Welcome to SPA24</h1>
+          </div>
+          {/* Menu items */}
+          <div className="flex flex-grow flex-col p-4 items-center">
+            <div>{profile?.displayName}</div>
+            <div className="pt-4">
+              <Calendar
+                mode="multiple"
+                className="rounded-md border p-4"
+                selected={getSelectedSessions(sessions, selectedSessions)}
+              />
             </div>
-          ))}
+            <div className="pt-4">{selectedMovies.length} selected movies</div>
+            {/* Sidebar buttons */}
+            <div className="mt-auto flex-col">
+              <Button className="m-2">
+                <NavLink to="/schedule">My Schedule</NavLink>
+              </Button>
+              <Button className="m-2">
+                <NavLink to="/logout">Logout</NavLink>
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 flex overflow-hidden" style={{backgroundImage: 'url(\'/images/muted-background.jpg\')'}}>
+          <div className="flex-1 overflow-y-scroll">
+            {/* Main content */}
+            {categories.map((category) => (
+              <div key={category}>
+                <CategoryComponent category={category}></CategoryComponent>
+                {movies
+                  .filter((movie) => movie.categoryName === category)
+                  .map((movie) => (
+                    <Fragment key={`${movie.categoryName}-${movie.slug}`}>
+                      <FilmComponent selectedMovies={selectedMovies} onClickHandler={onSetMovie} film={movie}/>
+                      <SessionsComponent
+                        debug={false}
+                        onClickHandler={onSetSession}
+                        selectedSessions={selectedSessions}
+                        sessions={sessions.filter((session) => session.movieId === movie.movieId)}
+                      />
+                    </Fragment>
+                  ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
