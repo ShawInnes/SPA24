@@ -53,6 +53,24 @@ export const loader: any = async ({request}: LoaderFunctionArgs) => {
   });
 };
 
+export const action = async ({request}: ActionFunctionArgs) => {
+  const session = await getSession(request.headers.get('Cookie'));
+  const profileId = session.data.user?.profile?.id;
+  const formData = await request.formData();
+
+  const selectedSessions = formData.get('selectedSessions');
+  if (selectedSessions) {
+    await kv.hset(profileId, {selectedSessions: selectedSessions});
+  }
+
+  const selectedMovies = formData.get('selectedMovies');
+  if (selectedMovies) {
+    await kv.hset(profileId, {selectedMovies: selectedMovies});
+  }
+
+  return {selectedSessions, selectedMovies};
+};
+
 export const getSelectedSessions = (sessions: Session[], selectedSessions: string[]) => {
   const filteredSessions = sessions.filter((session) => selectedSessions.includes(session.sessionId));
   return filteredSessions.map(p => dayjs(p.showtimeDate.replace('Z', '')).toDate());
@@ -64,11 +82,22 @@ export const getSelectedMovie = (movies: Film[], movieId: string): Film => {
 
 export default function Index() {
   const {movies, sessions, profile, selectedSessions, selectedMovies} = useLoaderData<typeof loader>();
+  const submit = useSubmit();
+
+  const onSetSession = async (sessionId: string) => {
+    if (selectedSessions.includes(sessionId)) {
+      const tempValue = selectedSessions.filter((session) => session !== sessionId);
+      submit({selectedSessions: JSON.stringify(tempValue)}, {method: 'POST'});
+    } else {
+      const tempValue = [...selectedSessions, sessionId];
+      submit({selectedSessions: JSON.stringify(tempValue)}, {method: 'POST'});
+    }
+  };
 
   return (
     <div className="flex h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <div
-        className="gap-2 border-r border-gray-300 bg-white shadow-lg flex flex-col h-full md:max-w-[220px] lg:max-w-[280px]">
+        className="hidden md:block lg:block gap-2 border-r border-gray-300 bg-white shadow-lg flex flex-col h-full md:max-w-[220px] lg:max-w-[280px]">
         <div className="flex items-center border-b px-4 lg:h-[60px] lg:px-6 bg-yellow-300">
           <h1>Welcome to SPA24</h1>
         </div>
@@ -78,6 +107,9 @@ export default function Index() {
             {selectedMovies.length} selected movies
           </div>
           <div className="mt-auto">
+            <Button className="m-2">
+              <NavLink to="/dashboard">Full List</NavLink>
+            </Button>
             <Button>
               <NavLink to="/logout">Logout</NavLink>
             </Button>
@@ -85,7 +117,7 @@ export default function Index() {
         </div>
       </div>
       <div className="flex-1 flex overflow-hidden">
-        <div className="flex-1 overflow-y-scroll">
+        <div className="flex-1 overflow-y-scroll pl-2">
           {selectedMovies.map((movieId) => {
             const movie = getSelectedMovie(movies, movieId);
             return (
@@ -94,6 +126,7 @@ export default function Index() {
                 <SessionsComponent
                   sessions={sessions.filter((session: Session) => session.movieId === movie.movieId)}
                   selectedSessions={selectedSessions}
+                  onClickHandler={onSetSession}
                   />
               </div>);
           })}

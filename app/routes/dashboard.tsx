@@ -8,7 +8,7 @@ import {Film, filmsSchema} from '~/schemas/film';
 import FilmComponent from '~/components/FilmComponent';
 import {Session, venuesSchema} from '~/schemas/venue';
 import SessionsComponent from '~/components/SessionsComponent';
-import {Fragment} from 'react';
+import {Fragment, useState} from 'react';
 import {destroySession, getSession} from '~/services/session.server';
 import {Button} from '~/components/ui/button';
 import {kv} from '@vercel/kv';
@@ -73,7 +73,7 @@ export const action = async ({request}: ActionFunctionArgs) => {
 
 export const getSelectedSessions = (sessions: Session[], selectedSessions: string[]) => {
   const filteredSessions = sessions.filter((session) => selectedSessions.includes(session.sessionId));
-  return filteredSessions.map(p => dayjs(p.showtimeDate.replace('Z','')).toDate());
+  return filteredSessions.map(p => dayjs(p.showtimeDate.replace('Z', '')).toDate());
 };
 
 export const getSelectedMovie = (movies: Film[], movieId: string): Film => {
@@ -106,25 +106,27 @@ export default function Index() {
 
   return (
     <div className="flex h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+      {/* Sidebar */}
       <div
-        className="gap-2 border-r border-gray-300 bg-white shadow-lg flex flex-col h-full md:max-w-[220px] lg:max-w-[280px]">
+        className="hidden md:block lg:block gap-2 border-r border-gray-300 bg-white shadow-lg flex flex-col h-full md:max-w-[220px] lg:max-w-[280px]">
         <div className="flex items-center border-b px-4 lg:h-[60px] lg:px-6 bg-yellow-300">
           <h1>Welcome to SPA24</h1>
         </div>
+        {/* Menu items */}
         <div className="flex flex-grow flex-col p-4 items-center">
           <div>{profile?.displayName}</div>
           <div className="pt-4">
-            <Calendar mode="multiple"
-                      className="rounded-md border p-4"
-                      selected={getSelectedSessions(sessions, selectedSessions)}
+            <Calendar
+              mode="multiple"
+              className="rounded-md border p-4"
+              selected={getSelectedSessions(sessions, selectedSessions)}
             />
           </div>
-          <div className="pt-4">
-            {selectedMovies.length} selected movies
-          </div>
+          <div className="pt-4">{selectedMovies.length} selected movies</div>
+          {/* Sidebar buttons */}
           <div className="mt-auto flex-col">
             <Button className="m-2">
-              <NavLink to="/schedule">Schedule</NavLink>
+              <NavLink to="/schedule">My Schedule</NavLink>
             </Button>
             <Button className="m-2">
               <NavLink to="/logout">Logout</NavLink>
@@ -132,26 +134,24 @@ export default function Index() {
           </div>
         </div>
       </div>
-      <div className="flex-1 flex overflow-hidden"
-           style={{backgroundImage: 'url(\'/images/muted-background.jpg\')'}}>
+
+      {/* Main Content */}
+      <div className="flex-1 flex overflow-hidden" style={{backgroundImage: 'url(\'/images/muted-background.jpg\')'}}>
         <div className="flex-1 overflow-y-scroll">
+          {/* Main content */}
           {categories.map((category) => (
             <div key={category}>
               <CategoryComponent category={category}></CategoryComponent>
               {movies
-                .filter((movie: Film) => movie.categoryName === category)
-                .map((movie: Film) => (
+                .filter((movie) => movie.categoryName === category)
+                .map((movie) => (
                   <Fragment key={`${movie.categoryName}-${movie.slug}`}>
-                    <FilmComponent
-                      selectedMovies={selectedMovies}
-                      onClickHandler={onSetMovie}
-                      film={movie}
-                    />
+                    <FilmComponent selectedMovies={selectedMovies} onClickHandler={onSetMovie} film={movie}/>
                     <SessionsComponent
                       debug={false}
                       onClickHandler={onSetSession}
                       selectedSessions={selectedSessions}
-                      sessions={sessions.filter((session: Session) => session.movieId === movie.movieId)}
+                      sessions={sessions.filter((session) => session.movieId === movie.movieId)}
                     />
                   </Fragment>
                 ))}

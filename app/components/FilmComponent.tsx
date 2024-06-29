@@ -14,10 +14,10 @@ const FilmComponent: React.FC<FilmComponentProps> = ({film, selectedMovies, onCl
   const isSelected = selectedMovies.includes(film.movieId);
 
   return (
-    <div data-isSelected={isSelected} className="flex flex-col bg-amber-50
-    data-[isSelected=true]:bg-amber-300
-    data-[isSelected=true]:border-red-500
-    data-[isSelected=true]:border-4
+    <div data-isselected={isSelected} className="flex flex-col bg-amber-50
+    data-[isselected=true]:bg-amber-300
+    data-[isselected=true]:border-red-500
+    data-[isselected=true]:border-4
     p-3 rounded-lg shadow-md my-2 mx-2">
       <div className="flex flex-row items-center">
         <div className="grow flex-row">
